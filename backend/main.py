@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import yt_dlp
@@ -13,10 +14,23 @@ if not GEMINI_API_KEY:
     raise ValueError("Gemini API key not found. Please set it in your .env file.")
 genai.configure(api_key=GEMINI_API_KEY)
 
+
 class VideoRequest(BaseModel):
     video_url: str
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/api/process-video")
 async def process_video(request: VideoRequest):
